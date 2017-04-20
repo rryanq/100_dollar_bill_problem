@@ -64,10 +64,13 @@ void print_solutions(vector<int> dollars, int min_bill, int max_bill, int dollar
 void print_all(vector<int> dollars, int min_bill, int max_bill, int dollar_amount, 
 	       const set<int, Greater> &dollars_in, const int (&cash_register)[7]);
 
+void check_args(int argc, char * argv[]);
 
 //main takes ints that represent dollar denominations as its first arguments,
 //and the final argument is the dollar amount that should be summed to
 int main(int argc, char * argv[]) {
+
+  check_args(argc, argv);
 
   //dollars_in represents the denominations we will use to solve the problem
   set<int, Greater> dollars_in;
@@ -313,5 +316,14 @@ void print_all(vector<int> dollars, int min_bill, int max_bill, int dollar_amoun
     //pop the unwanted numbers off of the end
     change_bills.clear();
     //clear change_bills
+  }
+}
+
+void check_args(int argc, char * argv[]) {
+  if(argc < 3) {
+    cout << endl << "ERROR: Command line arguments should read as follows:" << endl;
+    cout << "./[executable] [list of denominations] [amount to sum to]" << endl;
+    cout << "Ex: ./dollar_bill_v2.exe 100 50 20 10 5 2 1 100" << endl;
+    exit(EXIT_FAILURE);
   }
 }
