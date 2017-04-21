@@ -29,7 +29,7 @@ struct Greater {
 //to customer in change
 //returns a pair of ints that contains <number of all combinations tried,
 //number of solutions to the problem>
-pair<int, int> count_ways(vector<int> dollars, int min_bill, 
+pair<int, int> count_ways(vector<int> &dollars, int min_bill, 
                           int max_bill, int dollar_amount, 
                           const set<int, Greater> &dollars_in,
                           const int (&cash_register)[7]);
@@ -57,11 +57,11 @@ void update_dollars(vector<int> &dollars, int &denomination,
 
 //EFFECTS: prints the entire sequence of dollars that make up each solution,
 //followed by the dollar amount summed by the bills contained in the sequence
-void print_solutions(vector<int> dollars, int min_bill, int max_bill, int dollar_amount,
+void print_solutions(vector<int> &dollars, int min_bill, int max_bill, int dollar_amount,
 		     const set<int, Greater> &dollars_in, const int (&cash_register)[7]);
 
 //EFFECTS: prints all combinations tried: for testing purposes
-void print_all(vector<int> dollars, int min_bill, int max_bill, int dollar_amount, 
+void print_all(vector<int> &dollars, int min_bill, int max_bill, int dollar_amount, 
 	       const set<int, Greater> &dollars_in, const int (&cash_register)[7]);
 
 void check_args(int argc, char * argv[]);
@@ -105,7 +105,8 @@ int main(int argc, char * argv[]) {
     count_ways(dollars, min_bill, max_bill, dollar_amount, dollars_in, cash_register);
 
   //print statements
-  print_solutions(dollars, min_bill, max_bill, dollar_amount, dollars_in, cash_register);
+  cout << endl;
+  //print_solutions(dollars, min_bill, max_bill, dollar_amount, dollars_in, cash_register);
   //print_all(dollars, min_bill, max_bill, dollar_amount, dollars_in, cash_register);
 
   cout << endl << "BILLS USED: ";
@@ -113,16 +114,16 @@ int main(int argc, char * argv[]) {
     cout << '$' << denom << " ";
   }
   cout << endl;
-  cout << "TOTAL NUMBER OF WAYS TO SOLVE PROBLEM " <<
-  "WITH DOLLAR AMOUNT = $" << dollar_amount << ": " 
+  cout << "AMOUNT TO SUM TO: $" << dollar_amount << endl;
+  cout << "TOTAL NUMBER OF SOLUTIONS: " 
   << combos_solutions.second << endl;
   cout << "TOTAL COMBINATIONS TRIED: " << 
-    combos_solutions.first << endl;
+    combos_solutions.first << endl << endl;
   return 0;
 }
 
 
-pair<int, int> count_ways(vector<int> dollars, int min_bill, 
+pair<int, int> count_ways(vector<int> &dollars, int min_bill, 
                           int max_bill, int dollar_amount, 
 			  const set<int, Greater> &dollars_in, 
                           const int (&cash_register)[7]) {
@@ -134,7 +135,7 @@ pair<int, int> count_ways(vector<int> dollars, int min_bill,
   int change = 0;
   int solutions = 0;
 
-  while(dollars[0] != min_bill) {
+  while(!(dollars.empty())) {
     total = 0; //reset total
     change = 0; //reset change, may not be necessary
     for(unsigned i = 0; i < dollars.size(); ++i) {
@@ -177,12 +178,6 @@ bool check_for_solution(int change, const vector<int> &dollars,
   return true;
 }
 
-//WARNING: The way change_bills is set up right now, change can
-//only be made out of the denominations that we start with
-//This is problematic: we want change bills to include both
-//real-life denominations and whatever the user inputs
-//OR should they only be real life denominations? If so,
-//there has to be a limit on them. $1000 is probably a good limit
 void update_change_bills(int change, vector<int> &change_bills, 
                          const int (&cash_register)[7]) {
   while(change != 0) {
@@ -196,14 +191,15 @@ void update_change_bills(int change, vector<int> &change_bills,
   }
 }
 
-//KEEP LOOKING AROUND IN THIS FUNCTIONS FOR THE SEG FAULT
 void update_dollars(vector<int> &dollars, int &denomination, 
                     const set<int, Greater> &dollars_in) {
-  
+
   set<int, Greater>::iterator it = dollars_in.find(denomination);
   set<int, Greater>::iterator last = dollars_in.end();
   --last; //now last is an iterator to the last element in the set,
           //which should be the smallest denomination
+
+  //if the bill at the end of dollars is the smallest denomination
   if(it == last) {
     for(unsigned i = 0; i < dollars.size(); ++i) {
       if(dollars[i] == *last) {
@@ -211,20 +207,28 @@ void update_dollars(vector<int> &dollars, int &denomination,
 	//erase all of the bills with the smallest denomination
       }
     }
-    if(dollars.back()) {
+    //if dollars is not empty
+    if(!dollars.empty()) { /*dollars.back()*/
       it = dollars_in.find(dollars.back());
+      //pop off the denomination remaining at the right end and
+      //set the denomination-to-add to the next smallest denomination
       dollars.pop_back();
       denomination = *(++it);
+      //do this here so that dollars is not empty
+      dollars.push_back(denomination);
+      //cout << "denomination: " << *it << endl;
     }
     else return;
   }
   else {
     dollars.pop_back();
     denomination = *(++it);
+    //do this here so that dollars is not empty
+    dollars.push_back(denomination);
   }
 }
 
-void print_solutions(vector<int> dollars, int min_bill, int max_bill, int dollar_amount, 
+void print_solutions(vector<int> &dollars, int min_bill, int max_bill, int dollar_amount, 
 		     const set<int, Greater> &dollars_in, const int (&cash_register)[7]) {
   int sum = 0;
   int total = 0;
@@ -234,7 +238,7 @@ void print_solutions(vector<int> dollars, int min_bill, int max_bill, int dollar
   int change = 0;
   int test_count = 0;
   cout << endl;
-  while(dollars[0] != min_bill) {
+  while(!(dollars.empty())) {
     total = 0; //reset total
     change = 0; //reset change, may not be necessary
     for(unsigned i = 0; i < dollars.size(); ++i) {
@@ -272,7 +276,7 @@ void print_solutions(vector<int> dollars, int min_bill, int max_bill, int dollar
   }
 }
 
-void print_all(vector<int> dollars, int min_bill, int max_bill, int dollar_amount, 
+void print_all(vector<int> &dollars, int min_bill, int max_bill, int dollar_amount, 
 	       const set<int, Greater> &dollars_in, const int (&cash_register)[7]) {
   int sum = 0;
   int total = 0;
@@ -282,7 +286,7 @@ void print_all(vector<int> dollars, int min_bill, int max_bill, int dollar_amoun
   int change = 0;
   int test_count = 0;
   cout << endl;
-  while(dollars[0] != min_bill) {
+  while(!(dollars.empty())) {
     total = 0; //reset total
     change = 0; //reset change, may not be necessary
     for(unsigned i = 0; i < dollars.size(); ++i) {
