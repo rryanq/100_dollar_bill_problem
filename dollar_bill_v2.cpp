@@ -330,4 +330,10 @@ void check_args(int argc, char * argv[]) {
     cout << "Ex: ./dollar_bill_v2.exe 100 50 20 10 5 2 1 100" << endl;
     exit(EXIT_FAILURE);
   }
+  for(int i = 1; i < argc - 1; ++i) {
+    if(stoi(argv[i]) <= 0) {
+      cout << endl << "ERROR: dollar amounts must be positive and non-zero!" << endl;
+      exit(EXIT_FAILURE);
+    } 
+  }
 }
